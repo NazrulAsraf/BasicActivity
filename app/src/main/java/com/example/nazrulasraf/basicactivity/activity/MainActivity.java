@@ -32,6 +32,7 @@ import com.example.nazrulasraf.basicactivity.fragment.NotificationsFragment;
 import com.example.nazrulasraf.basicactivity.fragment.PhotosFragment;
 import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
 import com.example.nazrulasraf.basicactivity.other.CircleTransform;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener, MoviesFragment.OnFragmentInteractionListener,
@@ -369,6 +370,11 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_logout) {
             Toast.makeText(getApplicationContext(), "Logout user!", Toast.LENGTH_LONG).show();
+
+            FirebaseAuth.getInstance().signOut();
+            finish();
+            startActivity(new Intent(this, LoginActivity.class));
+
             return true;
         }
 
