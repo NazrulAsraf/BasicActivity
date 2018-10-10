@@ -1,7 +1,5 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -26,17 +24,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.nazrulasraf.basicactivity.R;
+import com.example.nazrulasraf.basicactivity.fragment.ClubFragment;
 import com.example.nazrulasraf.basicactivity.fragment.HomeFragment;
-import com.example.nazrulasraf.basicactivity.fragment.MoviesFragment;
 import com.example.nazrulasraf.basicactivity.fragment.NotificationsFragment;
-import com.example.nazrulasraf.basicactivity.fragment.PhotosFragment;
+import com.example.nazrulasraf.basicactivity.fragment.ProfileFragment;
 import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
 import com.example.nazrulasraf.basicactivity.other.CircleTransform;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements
-        HomeFragment.OnFragmentInteractionListener, MoviesFragment.OnFragmentInteractionListener,
-        NotificationsFragment.OnFragmentInteractionListener, PhotosFragment.OnFragmentInteractionListener,
+        HomeFragment.OnFragmentInteractionListener, ClubFragment.OnFragmentInteractionListener,
+        NotificationsFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener {
 
 
@@ -117,15 +115,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    /**
-     * public class showToastMethod implements View.OnClickListener {
-     *
-     * @Override public void onClick(View view) {
-     * Toast.makeText(MainActivity.this, "You clicked Action on Snackbar", Toast.LENGTH_SHORT).show();
-     * }
-     * }
-     **/
-
 
     private void loadNavHeader() {
         // name, website
@@ -147,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
                 .into(imgProfile);
 
         // showing dot next to notifications label
-        navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+        //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
     /***
@@ -207,24 +196,24 @@ public class MainActivity extends AppCompatActivity implements
         switch (navItemIndex) {
             case 0:
                 // home
-                HomeFragment homeFragment = new HomeFragment();
+                Fragment homeFragment = new HomeFragment();
                 return homeFragment;
             case 1:
                 // photos
-                PhotosFragment photosFragment = new PhotosFragment();
-                return photosFragment;
+                Fragment profileFragment = new ProfileFragment();
+                return profileFragment;
             case 2:
                 // movies fragment
-                MoviesFragment moviesFragment = new MoviesFragment();
-                return moviesFragment;
+                Fragment clubFragment = new ClubFragment();
+                return clubFragment;
             case 3:
                 // notifications fragment
-                NotificationsFragment notificationsFragment = new NotificationsFragment();
+                Fragment notificationsFragment = new NotificationsFragment();
                 return notificationsFragment;
 
             case 4:
                 // settings fragment
-                SettingsFragment settingsFragment = new SettingsFragment();
+                Fragment settingsFragment = new SettingsFragment();
                 return settingsFragment;
             default:
                 return new HomeFragment();
@@ -254,11 +243,11 @@ public class MainActivity extends AppCompatActivity implements
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
                         break;
-                    case R.id.nav_photos:
+                    case R.id.nav_profile:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
                         break;
-                    case R.id.nav_movies:
+                    case R.id.nav_club:
                         navItemIndex = 2;
                         CURRENT_TAG = TAG_MOVIES;
                         break;
@@ -315,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements
         };
 
         //Setting the actionbarToggle to drawer layout
-        drawer.setDrawerListener(actionBarDrawerToggle);
+        drawer.addDrawerListener(actionBarDrawerToggle);
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
@@ -405,35 +394,5 @@ public class MainActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
         //you can leave it empty
     }
-
-    //@Override
-    /**public boolean onCreateOptionsMenu(Menu menu) {
-     // Inflate the menu; this adds items to the action bar if it is present.
-     getMenuInflater().inflate(R.menu.menu_main, menu);
-     return true;
-     }**/
-
-    //@Override
-    /**public boolean onOptionsItemSelected(MenuItem item) {
-     // Handle action bar item clicks here. The action bar will
-     // automatically handle clicks on the Home/Up button, so long
-     // as you specify a parent activity in AndroidManifest.xml.
-     int id = item.getItemId();
-
-     //noinspection SimplifiableIfStatement
-     if (id == R.id.action_settings) {
-     Toast.makeText(this, "Setting is pressed", Toast.LENGTH_SHORT).show();
-     } else if (id == R.id.action_help) {
-     Toast.makeText(this, "Help is pressed", Toast.LENGTH_SHORT).show();
-
-     } else if (id == R.id.action_about) {
-     Toast.makeText(this, "About is pressed", Toast.LENGTH_SHORT).show();
-
-     } else if (id == R.id.action_exit) {
-     finish();
-     }
-
-     return super.onOptionsItemSelected(item);
-     }**/
 }
 

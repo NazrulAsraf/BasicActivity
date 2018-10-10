@@ -1,14 +1,19 @@
 package com.example.nazrulasraf.basicactivity.fragment;
 
 import android.content.Context;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.nazrulasraf.basicactivity.R;
+import com.example.nazrulasraf.basicactivity.other.CircleTransform;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +32,7 @@ public class HomeFragment extends android.support.v4.app.Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
 
     private OnFragmentInteractionListener mListener;
 

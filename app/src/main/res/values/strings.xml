@@ -12,8 +12,8 @@
 
     <!--Navigation Drawer menu labels-->
     <string name="nav_home">Home</string>
-    <string name="nav_photos">Posts</string>
-    <string name="nav_movies">Shared Preferences</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_club">Club</string>
     <string name="nav_notifications">Notifications</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_about_us">About Us</string>

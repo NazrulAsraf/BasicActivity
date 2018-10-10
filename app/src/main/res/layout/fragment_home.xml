@@ -48,15 +48,16 @@
                         android:text="@string/card_home"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@+id/imageView"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imageView"/>
+                        <!---->
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="208dp"
                         android:layout_marginTop="8dp"
                         android:src="@drawable/bg_488"
-                        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                        app:layout_constraintTop_toBottomOf="@+id/imageView"/>
 
                 </android.support.constraint.ConstraintLayout>
 
