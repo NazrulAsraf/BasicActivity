@@ -16,11 +16,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignActivity extends AppCompatActivity {
 
-    EditText editTextEmail, editTextPassword;
-    FirebaseAuth mAuth;
+    private EditText editTextEmail, editTextPassword, editTextUsername;
+    private FirebaseAuth mAuth;
+    private DatabaseReference dRef;
+    FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +35,11 @@ public class SignActivity extends AppCompatActivity {
         Button btnToLogIn = findViewById(R.id.btnToLogIn);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
+        editTextUsername = findViewById(R.id.editTextUsername);
 
         mAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        dRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         btnToLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,8 +59,15 @@ public class SignActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
+        final String username = editTextUsername.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
+
+        if (username.isEmpty()) {
+            editTextUsername.setError("Username is required");
+            editTextUsername.requestFocus();
+            return;
+        }
 
         if (email.isEmpty()) {
             editTextEmail.setError("Email is required");
@@ -82,6 +96,10 @@ public class SignActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+                    String user_id = mAuth.getCurrentUser().getUid();
+                    DatabaseReference current_user_db = dRef.child(user_id);
+                    current_user_db.child("Username").setValue(username);
+                    Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
                     finish();
                     startActivity(new Intent(SignActivity.this, MainActivity.class));
                 }

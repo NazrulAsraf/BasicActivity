@@ -1,6 +1,7 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +33,7 @@ import com.example.nazrulasraf.basicactivity.fragment.ProfileFragment;
 import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
 import com.example.nazrulasraf.basicactivity.other.CircleTransform;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener, ClubFragment.OnFragmentInteractionListener,
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
     private FloatingActionButton fab;
+    private FirebaseAuth mAuth;
 
 
     // urls to load navigation header background image
@@ -79,6 +83,21 @@ public class MainActivity extends AppCompatActivity implements
 
         mHandler = new Handler();
 
+        mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        FirebaseAuth.AuthStateListener mauthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                Log.d("MainActivity", "onAuthStateChanged");
+                if (user == null) {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                }
+            }
+        };
+
+
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         fab = findViewById(R.id.fab);
@@ -96,8 +115,9 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        //.setAction("Action", null).show();
+                startActivity(new Intent(MainActivity.this, PostActivity.class));
             }
         });
 
@@ -264,11 +284,11 @@ public class MainActivity extends AppCompatActivity implements
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
                         drawer.closeDrawers();
                         return true;
-                    case R.id.nav_privacy_policy:
+                    /**case R.id.nav_privacy_policy:
                         // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+                        startActivity(new Intent(MainActivity.this, PostActivity.class));
                         drawer.closeDrawers();
-                        return true;
+                        return true;**/
                     default:
                         navItemIndex = 0;
                 }
@@ -360,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_logout) {
             Toast.makeText(getApplicationContext(), "Logout user!", Toast.LENGTH_LONG).show();
 
-            FirebaseAuth.getInstance().signOut();
+            mAuth.signOut();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
 
