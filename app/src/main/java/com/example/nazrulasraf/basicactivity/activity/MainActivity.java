@@ -1,6 +1,7 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.content.Intent;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,6 +34,11 @@ import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
 import com.example.nazrulasraf.basicactivity.other.CircleTransform;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener, ClubFragment.OnFragmentInteractionListener,
@@ -49,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private FloatingActionButton fab;
     private FirebaseAuth mAuth;
+    private DatabaseReference userRef;
+    private String userID;
+    private String username;
 
 
     // urls to load navigation header background image
@@ -61,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
+    private static final String TAG_PROFILE = "profile";
+    private static final String TAG_CLUB = "club";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
@@ -97,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         fab = findViewById(R.id.fab);
@@ -115,9 +122,25 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        //.setAction("Action", null).show();
                 startActivity(new Intent(MainActivity.this, PostActivity.class));
+            }
+        });
+
+        //Load username from database into navheader.
+        userID = mAuth.getUid();
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
+
+        userRef.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                username = dataSnapshot.child("Username").getValue().toString();
+
+                txtName.setText(username);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 
@@ -138,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void loadNavHeader() {
         // name, website
-        txtName.setText("Nazrul Asraf");
+        //txtName.setText("Nazrul Asraf");
         txtWebsite.setText("FSKM UiTMSA");
 
         // loading header background image
@@ -265,11 +288,11 @@ public class MainActivity extends AppCompatActivity implements
                         break;
                     case R.id.nav_profile:
                         navItemIndex = 1;
-                        CURRENT_TAG = TAG_PHOTOS;
+                        CURRENT_TAG = TAG_PROFILE;
                         break;
                     case R.id.nav_club:
                         navItemIndex = 2;
-                        CURRENT_TAG = TAG_MOVIES;
+                        CURRENT_TAG = TAG_CLUB;
                         break;
                     case R.id.nav_notifications:
                         navItemIndex = 3;

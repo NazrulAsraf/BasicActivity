@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.nazrulasraf.basicactivity.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +29,8 @@ public class ProfileFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private DatabaseReference userRef;
 
     private OnFragmentInteractionListener mListener;
 
@@ -64,6 +68,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
@@ -73,6 +79,11 @@ public class ProfileFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 
     @Override
