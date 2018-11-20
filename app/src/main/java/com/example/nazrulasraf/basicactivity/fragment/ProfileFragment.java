@@ -8,16 +8,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.activity.EditProfileActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -40,11 +48,16 @@ public class ProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private Uri uri = null;
     private View profView;
+    private ImageView imageViewProf;
     private TextView tvUsername;
+    private Button btnEdit;
+    private String userID;
+
     private DatabaseReference userRef;
     private FirebaseAuth mAuth;
-    private Button btnEdit;
+    private FirebaseFirestore firebaseFireStore;
 
     private OnFragmentInteractionListener mListener;
 
@@ -88,9 +101,14 @@ public class ProfileFragment extends Fragment {
         profView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        firebaseFireStore = FirebaseFirestore.getInstance();
+
+        mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getCurrentUser().getUid();
 
         tvUsername = profView.findViewById(R.id.tvProfUsername);
         btnEdit = profView.findViewById(R.id.btnEditProf);
+        imageViewProf = profView.findViewById(R.id.imageViewProf);
 
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +131,30 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    if (task.getResult().exists()) {
+
+                        String image = task.getResult().getString("image");
+                        if (uri != null) {
+                            uri = Uri.parse(image);
+                        }
+
+                        RequestOptions placeholderRequest = new RequestOptions();
+                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_48);
+
+                        Glide.with(getActivity()).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imageViewProf);
+                    }
+                } else {
+                    String error = task.getException().getMessage();
+                    Toast.makeText(getContext(), "(FIRESTORE Retrieve Errror) : " + error, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         String userID = mAuth.getUid();
         userRef.child(userID).addValueEventListener(new ValueEventListener() {

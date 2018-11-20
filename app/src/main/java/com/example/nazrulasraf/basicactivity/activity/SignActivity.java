@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.example.nazrulasraf.basicactivity.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
@@ -22,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SignActivity extends AppCompatActivity {
 
-    private EditText editTextEmail, editTextPassword, editTextUsername, editTextConfPassword;
+    private TextInputEditText editTextEmail, editTextPassword, editTextUsername, editTextConfPassword;
     private FirebaseAuth mAuth;
     private DatabaseReference dRef;
     FirebaseDatabase firebaseDatabase;
@@ -32,8 +34,8 @@ public class SignActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign);
 
-        Button btnSignUp = findViewById(R.id.btnSignUp);
-        Button btnToLogIn = findViewById(R.id.btnToLogIn);
+        MaterialButton btnSignUp = findViewById(R.id.btnSignUp);
+        MaterialButton btnToLogIn = findViewById(R.id.btnToLogIn);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextUsername = findViewById(R.id.editTextUsername);

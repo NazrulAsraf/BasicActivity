@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.example.nazrulasraf.basicactivity.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -25,7 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class LoginActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
-    EditText editTextEmail, editTextPassword;
+    TextInputEditText editTextEmail, editTextPassword;
     DatabaseReference dRef;
     FirebaseDatabase firebaseDatabase;
 
@@ -38,8 +40,8 @@ public class LoginActivity extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         dRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
-        Button btnLogin = findViewById(R.id.btnLogin);
-        Button btnToSignUp = findViewById(R.id.btnToSignUp);
+        MaterialButton btnLogin = findViewById(R.id.btnLogin);
+        MaterialButton btnToSignUp = findViewById(R.id.btnToSignUp);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
 

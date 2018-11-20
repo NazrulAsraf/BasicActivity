@@ -14,12 +14,15 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.fragment.ClubFragment;
 import com.example.nazrulasraf.basicactivity.fragment.HomeFragment;
 import com.example.nazrulasraf.basicactivity.fragment.NotificationsFragment;
 import com.example.nazrulasraf.basicactivity.fragment.ProfileFragment;
 import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -54,16 +59,18 @@ public class MainActivity extends AppCompatActivity implements
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
     private FloatingActionButton fab;
-    private FirebaseAuth mAuth;
-    private DatabaseReference userRef;
     private String userID;
     private String username;
+    private Uri profUri = null;
 
+    private FirebaseAuth mAuth;
+    private DatabaseReference userRef;
+    private FirebaseFirestore firebaseFireStore;
 
     // urls to load navigation header background image
     // and profile image
     private static final int urlNavHeaderBg = R.drawable.bg_488;
-    private static final int urlProfileImg = R.drawable.img_prof;
+    //private static final int urlProfileImg = R.drawable.img_prof;
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -94,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements
 
         mAuth = FirebaseAuth.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseFireStore = FirebaseFirestore.getInstance();
 
         FirebaseAuth.AuthStateListener mauthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -128,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         //Load username from database into navheader.
-        userID = mAuth.getUid();
+        userID = mAuth.getCurrentUser().getUid();
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         userRef.child(userID).addValueEventListener(new ValueEventListener() {
@@ -157,6 +165,30 @@ public class MainActivity extends AppCompatActivity implements
             loadHomeFragment();
         }
 
+        firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    if (task.getResult().exists()) {
+
+                        String image = task.getResult().getString("image");
+                        if (profUri != null) {
+                            profUri = Uri.parse(image);
+                        }
+
+                        RequestOptions placeholderRequest = new RequestOptions();
+                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_48);
+
+                        Glide.with(MainActivity.this).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imgProfile);
+                    }
+                } else {
+                    String error = task.getException().getMessage();
+                    Toast.makeText(MainActivity.this, "(FIRESTORE Retrieve Errror) : " + error, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
     }
 
 
@@ -171,10 +203,10 @@ public class MainActivity extends AppCompatActivity implements
                 .into(imgNavHeaderBg);
 
         // Loading profile image
-        Glide.with(this).load(urlProfileImg)
-                .transition(withCrossFade())
-                .thumbnail(0.5f)
-                .into(imgProfile);
+//        Glide.with(this).load(urlProfileImg)
+//                .transition(withCrossFade())
+//                .thumbnail(0.5f)
+//                .into(imgProfile);
 
         // showing dot next to notifications label
         //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
@@ -306,10 +338,10 @@ public class MainActivity extends AppCompatActivity implements
                         drawer.closeDrawers();
                         return true;
                     /**case R.id.nav_privacy_policy:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, PostActivity.class));
-                        drawer.closeDrawers();
-                        return true;**/
+                     // launch new intent instead of loading fragment
+                     startActivity(new Intent(MainActivity.this, PostActivity.class));
+                     drawer.closeDrawers();
+                     return true;**/
                     default:
                         navItemIndex = 0;
                 }
