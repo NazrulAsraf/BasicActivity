@@ -1,16 +1,26 @@
 package com.example.nazrulasraf.basicactivity.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.nazrulasraf.basicactivity.R;
+import com.example.nazrulasraf.basicactivity.activity.EditProfileActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +40,11 @@ public class ProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private View profView;
+    private TextView tvUsername;
     private DatabaseReference userRef;
+    private FirebaseAuth mAuth;
+    private Button btnEdit;
 
     private OnFragmentInteractionListener mListener;
 
@@ -63,15 +77,30 @@ public class ProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        profView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+
+        tvUsername = profView.findViewById(R.id.tvProfUsername);
+        btnEdit = profView.findViewById(R.id.btnEditProf);
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editIntent = new Intent(getContext(), EditProfileActivity.class);
+                startActivity(editIntent);
+            }
+        });
+
+        return profView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -84,6 +113,21 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        String userID = mAuth.getUid();
+        userRef.child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String userprofName = dataSnapshot.child("Username").getValue().toString();
+
+                tvUsername.setText(userprofName);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override

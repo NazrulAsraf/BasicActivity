@@ -1,8 +1,6 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -19,9 +17,12 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 public class SignActivity extends AppCompatActivity {
 
-    private EditText editTextEmail, editTextPassword, editTextUsername;
+    private EditText editTextEmail, editTextPassword, editTextUsername, editTextConfPassword;
     private FirebaseAuth mAuth;
     private DatabaseReference dRef;
     FirebaseDatabase firebaseDatabase;
@@ -36,6 +37,7 @@ public class SignActivity extends AppCompatActivity {
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextUsername = findViewById(R.id.editTextUsername);
+        editTextConfPassword = findViewById(R.id.editTextConfPassword);
 
         mAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -62,6 +64,7 @@ public class SignActivity extends AppCompatActivity {
         final String username = editTextUsername.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
+        String confPassword = editTextConfPassword.getText().toString().trim();
 
         if (username.isEmpty()) {
             editTextUsername.setError("Username is required");
@@ -90,6 +93,11 @@ public class SignActivity extends AppCompatActivity {
         if (password.length() < 6) {
             editTextPassword.setError("Minimum length of password should be 6");
             editTextPassword.requestFocus();
+        }
+
+        if(!(password.equals(confPassword))){
+            editTextConfPassword.setError("Password do not match");
+            editTextConfPassword.requestFocus();
         }
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {

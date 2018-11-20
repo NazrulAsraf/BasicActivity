@@ -1,20 +1,9 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
 import android.net.Uri;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -31,7 +20,8 @@ import com.example.nazrulasraf.basicactivity.fragment.HomeFragment;
 import com.example.nazrulasraf.basicactivity.fragment.NotificationsFragment;
 import com.example.nazrulasraf.basicactivity.fragment.ProfileFragment;
 import com.example.nazrulasraf.basicactivity.fragment.SettingsFragment;
-import com.example.nazrulasraf.basicactivity.other.CircleTransform;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +29,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener, ClubFragment.OnFragmentInteractionListener,
@@ -166,16 +167,13 @@ public class MainActivity extends AppCompatActivity implements
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .transition(withCrossFade())
                 .into(imgNavHeaderBg);
 
         // Loading profile image
         Glide.with(this).load(urlProfileImg)
-                .crossFade()
+                .transition(withCrossFade())
                 .thumbnail(0.5f)
-                .bitmapTransform(new CircleTransform(this))
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgProfile);
 
         // showing dot next to notifications label

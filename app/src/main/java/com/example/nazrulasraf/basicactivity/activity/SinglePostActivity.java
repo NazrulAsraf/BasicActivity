@@ -1,9 +1,10 @@
 package com.example.nazrulasraf.basicactivity.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.nazrulasraf.basicactivity.R;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SinglePostActivity extends AppCompatActivity {
 
