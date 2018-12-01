@@ -51,8 +51,7 @@ public class ProfileFragment extends Fragment {
     private Uri uri = null;
     private View profView;
     private ImageView imageViewProf;
-    private TextView tvUsername;
-    private Button btnEdit;
+    private TextView tvUsername, tvFullName;
     private String userID;
 
     private DatabaseReference userRef;
@@ -107,16 +106,8 @@ public class ProfileFragment extends Fragment {
         userID = mAuth.getCurrentUser().getUid();
 
         tvUsername = profView.findViewById(R.id.tvProfUsername);
-        btnEdit = profView.findViewById(R.id.btnEditProf);
+        tvFullName = profView.findViewById(R.id.tvProfFullName);
         imageViewProf = profView.findViewById(R.id.imageViewProf);
-
-        btnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent editIntent = new Intent(getContext(), EditProfileActivity.class);
-                startActivity(editIntent);
-            }
-        });
 
         return profView;
     }
@@ -145,9 +136,9 @@ public class ProfileFragment extends Fragment {
                         }
 
                         RequestOptions placeholderRequest = new RequestOptions();
-                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_48);
+                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_24);
 
-                        Glide.with(getActivity()).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imageViewProf);
+                        Glide.with(getContext()).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imageViewProf);
                     }
                 } else {
                     String error = task.getException().getMessage();
@@ -161,8 +152,10 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String userprofName = dataSnapshot.child("Username").getValue().toString();
+                String userFullName = dataSnapshot.child("Full Name").getValue().toString();
 
                 tvUsername.setText(userprofName);
+                tvFullName.setText(userFullName);
             }
 
             @Override

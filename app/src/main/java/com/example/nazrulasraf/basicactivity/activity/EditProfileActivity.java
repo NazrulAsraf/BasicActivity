@@ -7,19 +7,25 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.nazrulasraf.basicactivity.R;
-import com.example.nazrulasraf.basicactivity.fragment.HomeFragment;
+import com.example.nazrulasraf.basicactivity.fragment.DialogConfirmPassword;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -28,7 +34,6 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +43,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditProfileActivity extends AppCompatActivity {
@@ -45,14 +52,18 @@ public class EditProfileActivity extends AppCompatActivity {
     private CircleImageView imageProf;
     private Uri uri = null;
     private String userID, imageUri;
+    private Toolbar toolbar;
     private boolean isChanged = false;
     private MaterialButton btnEditProf;
     private Bitmap compressedImageFile;
-    private TextInputEditText editTextUsername, editTextPassword, editTextConfPassword;
+    private TextInputEditText editTextUsername, editTextFullName;
 
     private StorageReference storage, pathRef;
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private FirebaseFirestore firebaseFireStore;
+    private DatabaseReference dRef;
+    FirebaseDatabase firebaseDatabase;
 
 
     @Override
@@ -60,40 +71,62 @@ public class EditProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
 
+        toolbar = findViewById(R.id.toolbarEditProf);
+        setSupportActionBar(toolbar);
+
         mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getCurrentUser().getUid();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         firebaseFireStore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
         pathRef = storage.child("profile_images").child(userID + ".jpg");
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        dRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         imageProf = findViewById(R.id.editProfImage);
         btnEditProf = findViewById(R.id.btnEditSave);
         editTextUsername = findViewById(R.id.editTextProfUsername);
-        editTextPassword = findViewById(R.id.editTextProfPassword);
-        editTextConfPassword = findViewById(R.id.editTextProfConfPassword);
+        editTextFullName = findViewById(R.id.editTextProfFullName);
 
-
+        //Get current user profile image
         firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                 if (task.isSuccessful()) {
                     if (task.getResult().exists()) {
 
                         String image = task.getResult().getString("image");
-                        if (uri != null) {
-                            uri = Uri.parse(image);
-                        }
+
+                        uri = Uri.parse(image);
 
                         RequestOptions placeholderRequest = new RequestOptions();
-                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_48);
+                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_24);
 
                         Glide.with(EditProfileActivity.this).setDefaultRequestOptions(placeholderRequest).load(image).into(imageProf);
                     }
                 } else {
                     String error = task.getException().getMessage();
-                    Toast.makeText(EditProfileActivity.this, "(FIRESTORE Retrieve Errror) : " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditProfileActivity.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        //Select Image from gallery
+        imageProf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(EditProfileActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+                        Toast.makeText(EditProfileActivity.this, "Permission is denied", Toast.LENGTH_LONG).show();
+                        ActivityCompat.requestPermissions(EditProfileActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                    } else {
+                        Toast.makeText(EditProfileActivity.this, "Permission Granted!", Toast.LENGTH_LONG).show();
+                        BringImagePicker();
+                    }
+                } else {
+                    BringImagePicker();
                 }
             }
         });
@@ -104,6 +137,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 if (uri != null) {
                     if (isChanged) {
                         userID = mAuth.getCurrentUser().getUid();
+                        updateUserProfile();
 
                         File newImageFile = new File(uri.getPath());
                         try {
@@ -136,7 +170,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                     if (downloadUri != null) {
                                         imageUri = downloadUri.toString();
 
-                                        storeFirestore(userID, imageUri);
+                                        storeFireStore(userID, imageUri);
                                     }
                                 } else {
                                     String error = task.getException().getMessage();
@@ -145,31 +179,15 @@ public class EditProfileActivity extends AppCompatActivity {
                             }
                         });
                     } else {
-                        storeFirestore(imageUri, userID);
+                        userID = mAuth.getCurrentUser().getUid();
+                        updateUserProfile();
                     }
-                }
-            }
-        });
-
-        imageProf.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(EditProfileActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                        Toast.makeText(EditProfileActivity.this, "Permission is denied", Toast.LENGTH_LONG).show();
-                        ActivityCompat.requestPermissions(EditProfileActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                    } else {
-                        BringImagePicker();
-                    }
-                } else {
-                    BringImagePicker();
                 }
             }
         });
     }
 
-    private void storeFirestore(String uid, String uri){
+    private void storeFireStore(String uid, String uri) {
 
         Map<String, String> userMap = new HashMap<>();
         userMap.put("user_id", uid);
@@ -179,11 +197,11 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(EditProfileActivity.this, "The Profile is updated.", Toast.LENGTH_LONG).show();
-                    Intent mainIntent = new Intent(EditProfileActivity.this, MainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
-                    finish();
+                    Toast.makeText(EditProfileActivity.this, "Stored to FireStore", Toast.LENGTH_LONG).show();
+//                    Intent mainIntent = new Intent(EditProfileActivity.this, MainActivity.class);
+//                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    startActivity(mainIntent);
+//                    finish();
                 } else {
                     String error = task.getException().getMessage();
                     Toast.makeText(EditProfileActivity.this, "(FIRESTORE Error) : " + error, Toast.LENGTH_LONG).show();
@@ -218,5 +236,26 @@ public class EditProfileActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    private void updateUserProfile() {
+        String username = editTextUsername.getText().toString();
+        String fullname = editTextFullName.getText().toString();
+
+        if (username.isEmpty()) {
+            editTextUsername.setError("Username is required");
+            editTextUsername.requestFocus();
+            return;
+        }
+
+        if (fullname.isEmpty()) {
+            editTextFullName.setError("Full Name is required");
+            editTextFullName.requestFocus();
+            return;
+        }
+
+        DatabaseReference current_user_db = dRef.child(userID);
+        current_user_db.child("Username").setValue(username);
+        current_user_db.child("Full Name").setValue(fullname);
     }
 }

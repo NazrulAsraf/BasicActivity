@@ -7,11 +7,11 @@
             android:title="@string/nav_home" />
         <item
             android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_photo_library_black_24dp"
+            android:icon="@drawable/baseline_account_circle_black_24"
             android:title="@string/nav_profile" />
         <item
             android:id="@+id/nav_club"
-            android:icon="@drawable/ic_local_movies_black_24dp"
+            android:icon="@drawable/baseline_group_24"
             android:title="@string/nav_club" />
 
         <item
@@ -30,9 +30,6 @@
             <item
                 android:id="@+id/nav_about_us"
                 android:title="@string/nav_about_us" />
-            <item
-                android:id="@+id/nav_privacy_policy"
-                android:title="@string/privacy_policy" />
         </menu>
     </item>
 </menu>

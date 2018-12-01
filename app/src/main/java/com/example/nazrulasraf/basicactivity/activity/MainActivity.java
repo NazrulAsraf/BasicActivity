@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements
 
     // urls to load navigation header background image
     // and profile image
-    private static final int urlNavHeaderBg = R.drawable.bg_488;
+    private static final int urlNavHeaderBg = R.drawable.bg_nav;
     //private static final int urlProfileImg = R.drawable.img_prof;
 
     // index to identify current nav menu item
@@ -164,7 +164,19 @@ public class MainActivity extends AppCompatActivity implements
             CURRENT_TAG = TAG_HOME;
             loadHomeFragment();
         }
+    }
 
+
+    private void loadNavHeader() {
+
+        txtWebsite.setText("FSKM UiTMSA");
+
+        // loading header background image
+        Glide.with(this).load(urlNavHeaderBg)
+                .transition(withCrossFade())
+                .into(imgNavHeaderBg);
+
+        //Load Profile Image from Firestore
         firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -178,38 +190,16 @@ public class MainActivity extends AppCompatActivity implements
                         }
 
                         RequestOptions placeholderRequest = new RequestOptions();
-                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_48);
+                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_24);
 
                         Glide.with(MainActivity.this).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imgProfile);
                     }
                 } else {
                     String error = task.getException().getMessage();
-                    Toast.makeText(MainActivity.this, "(FIRESTORE Retrieve Errror) : " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
                 }
             }
         });
-
-    }
-
-
-    private void loadNavHeader() {
-        // name, website
-        //txtName.setText("Nazrul Asraf");
-        txtWebsite.setText("FSKM UiTMSA");
-
-        // loading header background image
-        Glide.with(this).load(urlNavHeaderBg)
-                .transition(withCrossFade())
-                .into(imgNavHeaderBg);
-
-        // Loading profile image
-//        Glide.with(this).load(urlProfileImg)
-//                .transition(withCrossFade())
-//                .thumbnail(0.5f)
-//                .into(imgProfile);
-
-        // showing dot next to notifications label
-        //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
     /***
@@ -308,10 +298,8 @@ public class MainActivity extends AppCompatActivity implements
             // This method will trigger on item Click of navigation menu
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-                    //Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_home:
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
@@ -337,15 +325,9 @@ public class MainActivity extends AppCompatActivity implements
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
                         drawer.closeDrawers();
                         return true;
-                    /**case R.id.nav_privacy_policy:
-                     // launch new intent instead of loading fragment
-                     startActivity(new Intent(MainActivity.this, PostActivity.class));
-                     drawer.closeDrawers();
-                     return true;**/
                     default:
                         navItemIndex = 0;
                 }
-
                 //Checking if the item is in checked state or not, if not make it in checked state
                 if (menuItem.isChecked()) {
                     menuItem.setChecked(false);
@@ -359,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
         });
-
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
@@ -414,6 +395,10 @@ public class MainActivity extends AppCompatActivity implements
         if (navItemIndex == 0) {
             getMenuInflater().inflate(R.menu.main, menu);
         }
+        //show menu only when profile is selected
+        if (navItemIndex == 1){
+            getMenuInflater().inflate(R.menu.profile, menu);
+        }
 
         // when fragment is notifications, load the menu created for notifications
         if (navItemIndex == 3) {
@@ -438,6 +423,14 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(new Intent(this, LoginActivity.class));
 
             return true;
+        }
+
+        //user in profile fragment
+        if (id == R.id.action_edit_profile){
+            startActivity(new Intent(this, EditProfileActivity.class));
+        }
+        if (id == R.id.action_edit_account){
+            startActivity(new Intent(this, EditAccountActivity.class));
         }
 
         // user is in notifications fragment
