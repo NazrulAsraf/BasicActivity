@@ -51,7 +51,7 @@ public class ProfileFragment extends Fragment {
     private Uri uri = null;
     private View profView;
     private ImageView imageViewProf;
-    private TextView tvUsername, tvFullName;
+    private TextView tvUsername, tvFullName, tvClass;
     private String userID;
 
     private DatabaseReference userRef;
@@ -107,6 +107,7 @@ public class ProfileFragment extends Fragment {
 
         tvUsername = profView.findViewById(R.id.tvProfUsername);
         tvFullName = profView.findViewById(R.id.tvProfFullName);
+        tvClass = profView.findViewById(R.id.tvProfClass);
         imageViewProf = profView.findViewById(R.id.imageViewProf);
 
         return profView;
@@ -151,11 +152,12 @@ public class ProfileFragment extends Fragment {
         userRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String userprofName = dataSnapshot.child("Username").getValue().toString();
-                String userFullName = dataSnapshot.child("Full Name").getValue().toString();
-
+                String userprofName = dataSnapshot.child("username").getValue().toString();
+                String userFullName = dataSnapshot.child("fullname").getValue().toString();
+                String userclass = dataSnapshot.child("class").getValue().toString();
                 tvUsername.setText(userprofName);
                 tvFullName.setText(userFullName);
+                tvClass.setText(userclass);
             }
 
             @Override

@@ -1,19 +1,29 @@
 package com.example.nazrulasraf.basicactivity.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
 
+import android.provider.DocumentsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.SharedPreferences;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.nazrulasraf.basicactivity.R;
+import com.example.nazrulasraf.basicactivity.activity.AddClubActivity;
+import com.google.android.material.button.MaterialButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +45,8 @@ public class ClubFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    SharedPreferences sharedPreferences;
+    Spinner clubSpinner;
+    MaterialButton btnJoin, btnCreateClub;
 
     public ClubFragment() {
         // Required empty public constructor
@@ -72,30 +83,29 @@ public class ClubFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View RootView = inflater.inflate(R.layout.fragment_club, container, false);
+        final View RootView = inflater.inflate(R.layout.fragment_club, container, false);
 
-        Button saveBT = RootView.findViewById(R.id.btn_Save);
-        Button loadBT = RootView.findViewById(R.id.btn_Load);
-        final EditText valueEt = RootView.findViewById(R.id.editText);
-        final TextView resultTv = RootView.findViewById(R.id.textView);
+        clubSpinner = RootView.findViewById(R.id.spinnerClub);
+        btnJoin = RootView.findViewById(R.id.btnJoinClub);
+        btnCreateClub = RootView.findViewById(R.id.btnCreateClub);
 
-        saveBT.setOnClickListener(new View.OnClickListener() {
+        //Add item to spinner
+        List<String> addClub = new ArrayList<String>();
+        addClub.add("Create your club.");
+
+        //Adapter for spinner
+        ArrayAdapter<String> clubAdapter = new ArrayAdapter<String>(RootView.getContext(), android.R.layout.simple_spinner_item, addClub);
+        clubAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        clubSpinner.setAdapter(clubAdapter);
+
+
+        btnCreateClub.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                sharedPreferences = getActivity().getSharedPreferences("SavedData", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("myValue", valueEt.getText().toString());
-                editor.apply();
+            public void onClick(View v) {
+                Intent intent = new Intent(RootView.getContext(), AddClubActivity.class);
+                startActivity(intent);
             }
         });
-
-        loadBT.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resultTv.setText(sharedPreferences.getString("myValue", "Data not found!"));
-            }
-        });
-
 
         // Inflate the layout for this fragment
         return RootView;

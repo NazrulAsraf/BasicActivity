@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements
         userRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                username = dataSnapshot.child("Username").getValue().toString();
+                username = dataSnapshot.child("username").getValue().toString();
 
                 txtName.setText(username);
             }

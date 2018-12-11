@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -56,7 +57,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private boolean isChanged = false;
     private MaterialButton btnEditProf;
     private Bitmap compressedImageFile;
-    private TextInputEditText editTextUsername, editTextFullName;
+    private TextInputEditText editTextUsername, editTextFullName, editTextClass;
 
     private StorageReference storage, pathRef;
     private FirebaseAuth mAuth;
@@ -88,6 +89,7 @@ public class EditProfileActivity extends AppCompatActivity {
         btnEditProf = findViewById(R.id.btnEditSave);
         editTextUsername = findViewById(R.id.editTextProfUsername);
         editTextFullName = findViewById(R.id.editTextProfFullName);
+        editTextClass = findViewById(R.id.editTextProfClass);
 
         //Get current user profile image
         firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -172,6 +174,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
                                         storeFireStore(userID, imageUri);
                                     }
+                                    startActivity(new Intent(EditProfileActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                 } else {
                                     String error = task.getException().getMessage();
                                     Toast.makeText(EditProfileActivity.this, "(IMAGE Error) : " + error, Toast.LENGTH_LONG).show();
@@ -181,6 +184,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     } else {
                         userID = mAuth.getCurrentUser().getUid();
                         updateUserProfile();
+                        startActivity(new Intent(EditProfileActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 }
             }
@@ -197,11 +201,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(EditProfileActivity.this, "Stored to FireStore", Toast.LENGTH_LONG).show();
-//                    Intent mainIntent = new Intent(EditProfileActivity.this, MainActivity.class);
-//                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                    startActivity(mainIntent);
-//                    finish();
+                    Log.d("Edit Profile Activity", "Picture stored to FireStore");
                 } else {
                     String error = task.getException().getMessage();
                     Toast.makeText(EditProfileActivity.this, "(FIRESTORE Error) : " + error, Toast.LENGTH_LONG).show();
@@ -241,6 +241,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private void updateUserProfile() {
         String username = editTextUsername.getText().toString();
         String fullname = editTextFullName.getText().toString();
+        String userclass = editTextClass.getText().toString();
 
         if (username.isEmpty()) {
             editTextUsername.setError("Username is required");
@@ -254,8 +255,15 @@ public class EditProfileActivity extends AppCompatActivity {
             return;
         }
 
+        if (userclass.isEmpty()) {
+            editTextClass.setError("Class is required");
+            editTextClass.requestFocus();
+            return;
+        }
+
         DatabaseReference current_user_db = dRef.child(userID);
-        current_user_db.child("Username").setValue(username);
-        current_user_db.child("Full Name").setValue(fullname);
+        current_user_db.child("username").setValue(username);
+        current_user_db.child("fullname").setValue(fullname);
+        current_user_db.child("class").setValue(userclass);
     }
 }

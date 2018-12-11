@@ -69,5 +69,27 @@
             app:layout_constraintStart_toEndOf="@+id/tvFullName"
             app:layout_constraintTop_toBottomOf="@+id/tvProfUsername" />
 
+        <TextView
+            android:id="@+id/tvClass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Class"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvFullName" />
+
+        <TextView
+            android:id="@+id/tvProfClass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="8dp"
+            android:text="User Class"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/tvClass"
+            app:layout_constraintTop_toBottomOf="@+id/tvProfFullName" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -27,7 +27,8 @@
         <activity android:name=".activity.AboutUsActivity" />
         <activity
             android:name=".activity.PostActivity"
-            android:label="Post" />
+            android:label="Post"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".activity.StartActivity"
             android:theme="@style/SplashTheme">
@@ -43,13 +44,18 @@
         <activity android:name=".activity.SinglePostActivity" />
         <activity
             android:name=".activity.EditProfileActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:label="Edit Profile"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="Edit Profile"/>
-        <activity android:name=".activity.EditAccountActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activity.EditAccountActivity"
+            android:label="Edit Account"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan"
-            android:label="Edit Account"/>
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".activity.AddClubActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Create Club"
+            android:windowSoftInputMode="adjustPan"/>
     </application>
 
 </manifest>

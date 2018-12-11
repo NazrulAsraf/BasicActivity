@@ -108,7 +108,9 @@ public class SignActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     String user_id = mAuth.getCurrentUser().getUid();
                     DatabaseReference current_user_db = dRef.child(user_id);
-                    current_user_db.child("Username").setValue(username);
+                    current_user_db.child("username").setValue(username);
+                    current_user_db.child("fullname").setValue("User Full Name");
+                    current_user_db.child("class").setValue("User Class");
                     Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
                     finish();
                     startActivity(new Intent(SignActivity.this, MainActivity.class));

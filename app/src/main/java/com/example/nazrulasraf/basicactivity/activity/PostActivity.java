@@ -41,7 +41,8 @@ public class PostActivity extends AppCompatActivity {
         etPostContent = findViewById(R.id.etPostContent);
         btnPost = findViewById(R.id.btnPost);
 
-        dRef = database.getInstance().getReference().child("Posts");
+        database = FirebaseDatabase.getInstance();
+        dRef = database.getReference().child("Posts");
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         mDatabaseUsers = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
@@ -49,11 +50,11 @@ public class PostActivity extends AppCompatActivity {
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(PostActivity.this, "POSTING...", Toast.LENGTH_LONG).show();
                 final String postTitle = etPostTitle.getText().toString().trim();
                 final String postContent = etPostContent.getText().toString().trim();
 
                 if(!TextUtils.isEmpty(postTitle) && !TextUtils.isEmpty(postTitle)){
+                    Toast.makeText(PostActivity.this, "POSTING...", Toast.LENGTH_LONG).show();
                     final DatabaseReference newPost = dRef.push();
                     mDatabaseUsers.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -61,7 +62,7 @@ public class PostActivity extends AppCompatActivity {
                             newPost.child("title").setValue(postTitle);
                             newPost.child("content").setValue(postContent);
                             newPost.child("uid").setValue(mCurrentUser.getUid());
-                            newPost.child("username").setValue(dataSnapshot.child("Username").getValue()).
+                            newPost.child("username").setValue(dataSnapshot.child("username").getValue()).
                                     addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
@@ -79,6 +80,8 @@ public class PostActivity extends AppCompatActivity {
 
                         }
                     });
+                }else {
+                    Toast.makeText(PostActivity.this, "Please fill the fields above", Toast.LENGTH_LONG).show();
                 }
             }
         });

@@ -61,7 +61,7 @@ public class EditAccountActivity extends AppCompatActivity implements DialogConf
         });
     }
 
-    public void checkEmpty(){
+    public void checkEmpty() {
 
         String email = editTextEmail.getText().toString();
         final String newPassword = editTextPassword.getText().toString();
@@ -111,7 +111,7 @@ public class EditAccountActivity extends AppCompatActivity implements DialogConf
                     user.updateEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 Log.d("EditAccountActivity", "Email Updated");
                             }
                         }
@@ -138,7 +138,7 @@ public class EditAccountActivity extends AppCompatActivity implements DialogConf
                             }
                         }
                     });
-                }else {
+                } else {
                     Toast.makeText(EditAccountActivity.this, "Password is Wrong! Please Re-enter your password", Toast.LENGTH_SHORT).show();
                 }
             }

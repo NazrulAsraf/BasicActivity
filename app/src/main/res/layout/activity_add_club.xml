@@ -4,73 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.EditProfileActivity">
+    tools:context=".activity.AddClubActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarEditProf"
+        android:id="@+id/toolbarCreateClub"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="?actionBarSize"
         android:background="@color/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/white" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/editProfImage"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/baseline_account_circle_black_24"
-        app:layout_constraintEnd_toEndOf="parent"
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="Enter Club Details"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarEditProf" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbarCreateClub" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/editTextLayoutUsername"
+        android:id="@+id/editTextLayoutClubName"
         style="@style/TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editProfImage">
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextProfUsername"
+            android:id="@+id/editTextClubName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username"
+            android:hint="Club Name"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/editTextLayoutFullName"
+        android:id="@+id/editTextLayoutClubDetails"
         style="@style/TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="120"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextLayoutUsername">
+        app:layout_constraintTop_toBottomOf="@+id/editTextLayoutClubFaculty">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextProfFullName"
+            android:id="@+id/editTextClubDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name"
-            android:inputType="textPersonName|textCapWords" />
-
+            android:hint="Club Details"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="5" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/editTextLayoutClass"
+        android:id="@+id/editTextLayoutClubFaculty"
         style="@style/TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,28 +78,26 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextLayoutFullName">
+        app:layout_constraintTop_toBottomOf="@+id/editTextLayoutClubName">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextProfClass"
+            android:id="@+id/editTextClubFaculty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Class"
-            android:inputType="text|textCapCharacters" />
+            android:hint="Faculty" />
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEditSave"
+        android:id="@+id/btnSaveClub"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
