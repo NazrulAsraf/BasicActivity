@@ -63,7 +63,6 @@ public class AddClubActivity extends AppCompatActivity {
 
                 checkFields(clubName, clubDetails, clubFaculty);
 
-
                 final DatabaseReference newClub = dRef.push();
                 mDatabaseUser.addValueEventListener(new ValueEventListener() {
                     @Override

@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.provider.DocumentsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +23,14 @@ import android.widget.TextView;
 
 import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.activity.AddClubActivity;
+import com.example.nazrulasraf.basicactivity.other.ClubData;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +57,7 @@ public class ClubFragment extends Fragment {
 
     Spinner clubSpinner;
     MaterialButton btnJoin, btnCreateClub;
+    DatabaseReference dbClub;
 
     public ClubFragment() {
         // Required empty public constructor
@@ -85,16 +96,18 @@ public class ClubFragment extends Fragment {
 
         final View RootView = inflater.inflate(R.layout.fragment_club, container, false);
 
+        dbClub = FirebaseDatabase.getInstance().getReference().child("Club");
+
         clubSpinner = RootView.findViewById(R.id.spinnerClub);
         btnJoin = RootView.findViewById(R.id.btnJoinClub);
         btnCreateClub = RootView.findViewById(R.id.btnCreateClub);
 
         //Add item to spinner
-        List<String> addClub = new ArrayList<String>();
-        addClub.add("Create your club.");
+//        ArrayList<String> addClub = new ArrayList<>();
+//        addClub.add("Create your club.");
 
         //Adapter for spinner
-        ArrayAdapter<String> clubAdapter = new ArrayAdapter<String>(RootView.getContext(), android.R.layout.simple_spinner_item, addClub);
+        ArrayAdapter<String> clubAdapter = new ArrayAdapter<>(RootView.getContext(), android.R.layout.simple_spinner_item, retrieveClubName());
         clubAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         clubSpinner.setAdapter(clubAdapter);
 
@@ -148,5 +161,41 @@ public class ClubFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public ArrayList<String> retrieveClubName() {
+
+        final ArrayList<String> clubName = new ArrayList<>();
+
+        dbClub.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ClubData clubData = dataSnapshot.getValue(ClubData.class);
+                clubName.add(clubData.getClubName());
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ClubData clubData = dataSnapshot.getValue(ClubData.class);
+                clubName.add(clubData.getClubName());
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        return clubName;
     }
 }
