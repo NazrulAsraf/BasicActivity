@@ -1,31 +1,30 @@
 package com.example.nazrulasraf.basicactivity.fragment;
 
+import androidx.appcompat.app.AlertDialog;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.DocumentsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.SharedPreferences;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.activity.AddClubActivity;
-import com.example.nazrulasraf.basicactivity.other.ClubData;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -55,9 +54,12 @@ public class ClubFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    Spinner clubSpinner;
-    MaterialButton btnJoin, btnCreateClub;
-    DatabaseReference dbClub;
+    private Spinner clubSpinner;
+    private MaterialButton btnJoin, btnCreateClub;
+    private DatabaseReference dbClub, dbUser;
+    private FirebaseAuth mAuth;
+
+    private String selectClub;
 
     public ClubFragment() {
         // Required empty public constructor
@@ -91,32 +93,105 @@ public class ClubFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         final View RootView = inflater.inflate(R.layout.fragment_club, container, false);
 
         dbClub = FirebaseDatabase.getInstance().getReference().child("Club");
+        dbUser = FirebaseDatabase.getInstance().getReference().child("Users");
+        mAuth = FirebaseAuth.getInstance();
 
         clubSpinner = RootView.findViewById(R.id.spinnerClub);
         btnJoin = RootView.findViewById(R.id.btnJoinClub);
         btnCreateClub = RootView.findViewById(R.id.btnCreateClub);
 
-        //Add item to spinner
-//        ArrayList<String> addClub = new ArrayList<>();
-//        addClub.add("Create your club.");
+        //To retrieve club name
+        dbClub.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final List<String> clubs = new ArrayList<String>();
 
-        //Adapter for spinner
-        ArrayAdapter<String> clubAdapter = new ArrayAdapter<>(RootView.getContext(), android.R.layout.simple_spinner_item, retrieveClubName());
-        clubAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        clubSpinner.setAdapter(clubAdapter);
+                for (DataSnapshot clubSnapshot : dataSnapshot.getChildren()) {
+                    String clubsName = clubSnapshot.child("clubName").getValue(String.class);
+                    clubs.add(clubsName);
+                }
 
+                ArrayAdapter<String> clubAdapter = new ArrayAdapter<>(RootView.getContext(), android.R.layout.simple_spinner_item, clubs);
+                clubAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                clubSpinner.setAdapter(clubAdapter);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        //To show selected item on spinner
+        clubSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectClub = clubSpinner.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        //To create club
         btnCreateClub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RootView.getContext(), AddClubActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        //To join a club
+        btnJoin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //To build a dialog
+                AlertDialog.Builder confDialog = new AlertDialog.Builder(getActivity());
+                confDialog.setMessage("Are you sure you want to join this club '" + selectClub + "'?").setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Action after Yes is pressed
+                                String userID = mAuth.getCurrentUser().getUid();
+                                final DatabaseReference current_db = dbUser.child(userID);
+                                if (current_db.child("clubJoined").equals(null)) {
+                                    current_db.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            current_db.child("clubJoined").setValue(selectClub).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Toast.makeText(getContext(), "You have successfully joined " + selectClub + "!", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }else
+                                    Toast.makeText(getContext(),"You are already in a club!", Toast.LENGTH_LONG).show();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Action after No is pressed
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog confAlert = confDialog.create();
+                confAlert.setTitle("Confirmation");
+                confAlert.show();
             }
         });
 
@@ -161,41 +236,5 @@ public class ClubFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-    }
-
-    public ArrayList<String> retrieveClubName() {
-
-        final ArrayList<String> clubName = new ArrayList<>();
-
-        dbClub.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                ClubData clubData = dataSnapshot.getValue(ClubData.class);
-                clubName.add(clubData.getClubName());
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                ClubData clubData = dataSnapshot.getValue(ClubData.class);
-                clubName.add(clubData.getClubName());
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        return clubName;
     }
 }

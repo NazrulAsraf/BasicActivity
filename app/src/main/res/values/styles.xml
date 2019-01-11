@@ -31,5 +31,6 @@
         <item name="android:paddingBottom">6dp</item>
     </style>
 
-    <style name="MyToolbar" parent="ThemeOverlay.MaterialComponents.ActionBar"/>
+    <style name="MyToolbar" parent="ThemeOverlay.MaterialComponents.ActionBar" />
+
 </resources>
