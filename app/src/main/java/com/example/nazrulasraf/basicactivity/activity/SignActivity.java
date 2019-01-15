@@ -111,6 +111,7 @@ public class SignActivity extends AppCompatActivity {
                     current_user_db.child("username").setValue(username);
                     current_user_db.child("fullname").setValue("User Full Name");
                     current_user_db.child("class").setValue("User Class");
+                    current_user_db.child("clubJoined").setValue("User Club");
                     Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
                     finish();
                     startActivity(new Intent(SignActivity.this, MainActivity.class));

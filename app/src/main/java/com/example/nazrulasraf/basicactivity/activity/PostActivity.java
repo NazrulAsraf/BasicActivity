@@ -3,6 +3,7 @@ package com.example.nazrulasraf.basicactivity.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,12 +25,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class PostActivity extends AppCompatActivity {
 
-    EditText etPostTitle, etPostContent;
-    Button btnPost;
-    FirebaseDatabase database;
-    FirebaseAuth mAuth;
-    FirebaseUser mCurrentUser;
-    DatabaseReference dRef, mDatabaseUsers;
+    private String clubJoined;
+    private EditText etPostTitle, etPostContent;
+    private Button btnPost;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
+    private DatabaseReference dRef, mDatabaseUsers;
 
 
     @Override
@@ -53,26 +55,40 @@ public class PostActivity extends AppCompatActivity {
                 final String postTitle = etPostTitle.getText().toString().trim();
                 final String postContent = etPostContent.getText().toString().trim();
 
-                if(!TextUtils.isEmpty(postTitle) && !TextUtils.isEmpty(postTitle)){
+                if (!TextUtils.isEmpty(postTitle) && !TextUtils.isEmpty(postTitle)) {
                     Toast.makeText(PostActivity.this, "POSTING...", Toast.LENGTH_LONG).show();
-                    final DatabaseReference newPost = dRef.push();
+                    //Get club joined by the user
                     mDatabaseUsers.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            newPost.child("title").setValue(postTitle);
-                            newPost.child("content").setValue(postContent);
-                            newPost.child("uid").setValue(mCurrentUser.getUid());
-                            newPost.child("username").setValue(dataSnapshot.child("username").getValue()).
-                                    addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
-                                                Intent intent = new Intent(PostActivity.this, MainActivity.class);
-                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                startActivity(intent);
-                                            }
-                                        }
-                                    });
+                            clubJoined = dataSnapshot.child("clubJoined").getValue().toString();
+
+                            //To post
+                            final DatabaseReference newPost = dRef.child(clubJoined).push();
+                            mDatabaseUsers.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    newPost.child("title").setValue(postTitle);
+                                    newPost.child("content").setValue(postContent);
+                                    newPost.child("uid").setValue(mCurrentUser.getUid());
+                                    newPost.child("username").setValue(dataSnapshot.child("username").getValue()).
+                                            addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                        startActivity(intent);
+                                                    }
+                                                }
+                                            });
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    Log.w("PostActivity", "writePost:onCancelled()", databaseError.toException());
+                                }
+                            });
                         }
 
                         @Override
@@ -80,7 +96,7 @@ public class PostActivity extends AppCompatActivity {
 
                         }
                     });
-                }else {
+                } else {
                     Toast.makeText(PostActivity.this, "Please fill the fields above", Toast.LENGTH_LONG).show();
                 }
             }

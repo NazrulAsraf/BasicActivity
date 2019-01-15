@@ -3,12 +3,6 @@ package com.example.nazrulasraf.basicactivity.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +12,17 @@ import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.other.PostsData;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,9 +42,12 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private String clubJoined, userID;
+
     private View homeView;
     private RecyclerView homePostsLists;
     private DatabaseReference postRef, userRef;
+    private FirebaseAuth mAuth;
 
 
     private OnFragmentInteractionListener mListener;
@@ -89,6 +92,9 @@ public class HomeFragment extends Fragment {
         homePostsLists = homeView.findViewById(R.id.recyclerView);
         homePostsLists.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getUid();
+
         postRef = FirebaseDatabase.getInstance().getReference().child("Posts");
         userRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -106,50 +112,64 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        FirebaseRecyclerOptions options =
-                new FirebaseRecyclerOptions.Builder<PostsData>()
-                .setQuery(postRef, PostsData.class)
-                .build();
-
-        FirebaseRecyclerAdapter<PostsData, PostsViewHolder> adapter
-                = new FirebaseRecyclerAdapter<PostsData, PostsViewHolder>(options) {
+        //Get the club joined by the user.
+        userRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
-            protected void onBindViewHolder(@NonNull final PostsViewHolder holder, int position, @NonNull PostsData model) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                clubJoined = dataSnapshot.child("clubJoined").getValue().toString();
+                //Retrieve post.
+                //Had to be done in this because the value of clubJoined is null when done outside this method.
+                FirebaseRecyclerOptions options =
+                        new FirebaseRecyclerOptions.Builder<PostsData>()
+                                .setQuery(postRef.child(clubJoined), PostsData.class)
+                                .build();
 
-                String userID = getRef(position).getKey();
-
-                postRef.child(userID).addValueEventListener(new ValueEventListener() {
+                FirebaseRecyclerAdapter<PostsData, PostsViewHolder> adapter
+                        = new FirebaseRecyclerAdapter<PostsData, PostsViewHolder>(options) {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String profileName = dataSnapshot.child("username").getValue().toString();
-                        String homePostTitle = dataSnapshot.child("title").getValue().toString();
-                        String homePostContent = dataSnapshot.child("content").getValue().toString();
+                    protected void onBindViewHolder(@NonNull final PostsViewHolder holder, int position, @NonNull PostsData model) {
 
-                        holder.userName.setText(profileName);
-                        holder.postTitle.setText(homePostTitle);
-                        holder.postContent.setText(homePostContent);
+                        String postID = getRef(position).getKey();
+
+                        postRef.child(clubJoined).child(postID).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                String profileName = dataSnapshot.child("username").getValue().toString();
+                                String homePostTitle = dataSnapshot.child("title").getValue().toString();
+                                String homePostContent = dataSnapshot.child("content").getValue().toString();
+
+                                holder.userName.setText(profileName);
+                                holder.postTitle.setText(homePostTitle);
+                                holder.postContent.setText(homePostContent);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
 
+                    @NonNull
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
+                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_items, parent, false);
+                        PostsViewHolder viewHolder = new PostsViewHolder(view);
+
+                        return viewHolder;
                     }
-                });
+                };
+
+                homePostsLists.setAdapter(adapter);
+                adapter.startListening();
             }
 
-            @NonNull
             @Override
-            public PostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_items, parent, false);
-                PostsViewHolder viewHolder = new PostsViewHolder(view);
-
-                return viewHolder;
             }
-        };
-
-        homePostsLists.setAdapter(adapter);
-        adapter.startListening();
+        });
     }
 
     @Override
@@ -184,7 +204,7 @@ public class HomeFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public static class PostsViewHolder extends RecyclerView.ViewHolder{
+    public static class PostsViewHolder extends RecyclerView.ViewHolder {
         TextView userName, postTitle, postContent;
 
         public PostsViewHolder(View itemView) {
