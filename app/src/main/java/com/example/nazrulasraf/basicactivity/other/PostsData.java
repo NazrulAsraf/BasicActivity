@@ -2,6 +2,7 @@ package com.example.nazrulasraf.basicactivity.other;
 
 public class PostsData {
 
+    //This is the model class for Posts.
     private String title, content, username;
 
     public PostsData(String title, String content, String username){

@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".activity.ClubDetailsActivity"
+            android:label="Club Details"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activity.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -28,7 +32,7 @@
         <activity
             android:name=".activity.PostActivity"
             android:label="Post"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".activity.StartActivity"
             android:theme="@style/SplashTheme">
@@ -52,10 +56,11 @@
             android:label="Edit Account"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.AddClubActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+        <activity
+            android:name=".activity.AddClubActivity"
             android:label="Create Club"
-            android:windowSoftInputMode="adjustPan"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

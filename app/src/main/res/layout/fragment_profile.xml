@@ -28,11 +28,11 @@
         <TextView
             android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
-            android:layout_height="21dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:text="Username"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageViewProf" />
 
@@ -43,7 +43,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:text="Username"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/tvUsername"
             app:layout_constraintTop_toBottomOf="@+id/imageViewProf" />
 
@@ -52,9 +52,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Full Name"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
 
@@ -63,9 +63,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="User Full Name"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/tvFullName"
             app:layout_constraintTop_toBottomOf="@+id/tvProfUsername" />
 
@@ -74,9 +74,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Class"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvFullName" />
 
@@ -85,11 +85,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="64dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="User Class"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/tvClass"
             app:layout_constraintTop_toBottomOf="@+id/tvProfFullName" />
+
+        <TextView
+            android:id="@+id/tvClubJoined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Club Joined"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvClass" />
+
+        <TextView
+            android:id="@+id/tvProfClubJoined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="You have not joined a club."
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/tvClubJoined"
+            app:layout_constraintTop_toBottomOf="@+id/tvProfClass" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

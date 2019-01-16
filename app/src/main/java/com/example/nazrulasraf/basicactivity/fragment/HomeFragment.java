@@ -17,7 +17,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -90,7 +99,11 @@ public class HomeFragment extends Fragment {
         homeView = inflater.inflate(R.layout.fragment_home, container, false);
 
         homePostsLists = homeView.findViewById(R.id.recyclerView);
-        homePostsLists.setLayoutManager(new LinearLayoutManager(getContext()));
+        //To show the post from the recent to the last.
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+        homePostsLists.setLayoutManager(layoutManager);
 
         mAuth = FirebaseAuth.getInstance();
         userID = mAuth.getUid();
@@ -130,15 +143,22 @@ public class HomeFragment extends Fragment {
                     protected void onBindViewHolder(@NonNull final PostsViewHolder holder, int position, @NonNull PostsData model) {
 
                         String postID = getRef(position).getKey();
+                        Query query = postRef.child(clubJoined).child(postID).orderByChild("timestamp");
 
-                        postRef.child(clubJoined).child(postID).addValueEventListener(new ValueEventListener() {
+                        query.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 String profileName = dataSnapshot.child("username").getValue().toString();
                                 String homePostTitle = dataSnapshot.child("title").getValue().toString();
                                 String homePostContent = dataSnapshot.child("content").getValue().toString();
+                                Long homePostTimestamp = dataSnapshot.child("timestamp").getValue(Long.class);
+
+                                Date longDate = new Date(homePostTimestamp);
+                                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a EEE, dd MMM yyyy");
+                                sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
                                 holder.userName.setText(profileName);
+                                holder.postTimestamp.setText(sdf.format(longDate));
                                 holder.postTitle.setText(homePostTitle);
                                 holder.postContent.setText(homePostContent);
                             }
@@ -205,7 +225,7 @@ public class HomeFragment extends Fragment {
     }
 
     public static class PostsViewHolder extends RecyclerView.ViewHolder {
-        TextView userName, postTitle, postContent;
+        TextView userName, postTitle, postContent, postTimestamp;
 
         public PostsViewHolder(View itemView) {
             super(itemView);
@@ -213,6 +233,7 @@ public class HomeFragment extends Fragment {
             userName = itemView.findViewById(R.id.textViewUser);
             postTitle = itemView.findViewById(R.id.textViewTitle);
             postContent = itemView.findViewById(R.id.textViewPostContent);
+            postTimestamp = itemView.findViewById(R.id.textViewTimeStamp);
         }
     }
 }

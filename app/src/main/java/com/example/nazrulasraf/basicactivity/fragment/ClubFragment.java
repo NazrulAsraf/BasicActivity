@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.activity.AddClubActivity;
+import com.example.nazrulasraf.basicactivity.activity.ClubDetailsActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -54,11 +56,12 @@ public class ClubFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     private Spinner clubSpinner;
-    private MaterialButton btnJoin, btnCreateClub;
+    private MaterialButton btnJoin, btnCreateClub, btnClubDetails;
     private DatabaseReference dbClub, dbUser;
     private FirebaseAuth mAuth;
 
-    private String selectClub;
+    private String selectClub, userID;
+    private Query queryCheckClub;
 
     public ClubFragment() {
         // Required empty public constructor
@@ -100,10 +103,13 @@ public class ClubFragment extends Fragment {
         dbClub = FirebaseDatabase.getInstance().getReference().child("Club");
         dbUser = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
+        userID = mAuth.getCurrentUser().getUid();
+        queryCheckClub = dbUser.orderByChild("clubJoined").equalTo("User Club");
 
         clubSpinner = RootView.findViewById(R.id.spinnerClub);
         btnJoin = RootView.findViewById(R.id.btnJoinClub);
         btnCreateClub = RootView.findViewById(R.id.btnCreateClub);
+        btnClubDetails = RootView.findViewById(R.id.btnClubDetails);
 
         //To retrieve club name
         dbClub.addValueEventListener(new ValueEventListener() {
@@ -159,12 +165,11 @@ public class ClubFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //Action after Yes is pressed
-                                String userID = mAuth.getCurrentUser().getUid();
-                                String check = "User Club";
+//                                String userID = mAuth.getCurrentUser().getUid();
                                 final DatabaseReference current_db = dbUser.child(userID);
                                 //Query to check whether user has already joined a club or not.
-                                Query query = dbUser.orderByChild("clubJoined").equalTo("User Club");
-                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                Query query = dbUser.orderByChild("clubJoined").equalTo("User Club");
+                                queryCheckClub.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()) {
@@ -196,6 +201,37 @@ public class ClubFragment extends Fragment {
                 AlertDialog confAlert = confDialog.create();
                 confAlert.setTitle("Confirmation");
                 confAlert.show();
+            }
+        });
+
+        btnClubDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DatabaseReference curr_db = dbUser.child(userID);
+                queryCheckClub.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()){
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                            alert.setTitle("Alert");
+                            alert.setMessage("You are not in a club yet. Please join a club to view its details.");
+                            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        } else {
+                            Intent intent = new Intent(getActivity(), ClubDetailsActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 

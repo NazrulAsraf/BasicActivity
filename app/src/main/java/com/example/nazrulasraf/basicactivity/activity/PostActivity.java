@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.nazrulasraf.basicactivity.R;
@@ -18,7 +19,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FieldValue;
+
+import java.util.Calendar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +33,7 @@ public class PostActivity extends AppCompatActivity {
     private String clubJoined;
     private EditText etPostTitle, etPostContent;
     private Button btnPost;
+    private ProgressBar newPostProgress;
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
@@ -42,6 +48,7 @@ public class PostActivity extends AppCompatActivity {
         etPostTitle = findViewById(R.id.etPostTitle);
         etPostContent = findViewById(R.id.etPostContent);
         btnPost = findViewById(R.id.btnPost);
+        newPostProgress = findViewById(R.id.newPostProgress);
 
         database = FirebaseDatabase.getInstance();
         dRef = database.getReference().child("Posts");
@@ -63,11 +70,13 @@ public class PostActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             clubJoined = dataSnapshot.child("clubJoined").getValue().toString();
 
+                            newPostProgress.setVisibility(View.VISIBLE);
                             //To post
                             final DatabaseReference newPost = dRef.child(clubJoined).push();
                             mDatabaseUsers.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    newPost.child("timestamp").setValue(System.currentTimeMillis());
                                     newPost.child("title").setValue(postTitle);
                                     newPost.child("content").setValue(postContent);
                                     newPost.child("uid").setValue(mCurrentUser.getUid());
@@ -76,6 +85,7 @@ public class PostActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
+                                                        newPostProgress.setVisibility(View.INVISIBLE);
                                                         Intent intent = new Intent(PostActivity.this, MainActivity.class);
                                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                         startActivity(intent);
@@ -93,7 +103,7 @@ public class PostActivity extends AppCompatActivity {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                            newPostProgress.setVisibility(View.INVISIBLE);
                         }
                     });
                 } else {

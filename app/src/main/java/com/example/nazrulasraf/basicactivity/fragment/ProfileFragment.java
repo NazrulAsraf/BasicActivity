@@ -51,7 +51,7 @@ public class ProfileFragment extends Fragment {
     private Uri uri = null;
     private View profView;
     private ImageView imageViewProf;
-    private TextView tvUsername, tvFullName, tvClass;
+    private TextView tvUsername, tvFullName, tvClass, tvClub;
     private String userID;
 
     private DatabaseReference userRef;
@@ -108,6 +108,7 @@ public class ProfileFragment extends Fragment {
         tvUsername = profView.findViewById(R.id.tvProfUsername);
         tvFullName = profView.findViewById(R.id.tvProfFullName);
         tvClass = profView.findViewById(R.id.tvProfClass);
+        tvClub = profView.findViewById(R.id.tvProfClubJoined);
         imageViewProf = profView.findViewById(R.id.imageViewProf);
 
         return profView;
@@ -148,6 +149,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        //Retrieve user details.
         String userID = mAuth.getUid();
         userRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -155,9 +157,12 @@ public class ProfileFragment extends Fragment {
                 String userprofName = dataSnapshot.child("username").getValue().toString();
                 String userFullName = dataSnapshot.child("fullname").getValue().toString();
                 String userclass = dataSnapshot.child("class").getValue().toString();
+                String userClub = dataSnapshot.child("clubJoined").getValue().toString();
+
                 tvUsername.setText(userprofName);
                 tvFullName.setText(userFullName);
                 tvClass.setText(userclass);
+                tvClub.setText(userClub);
             }
 
             @Override
