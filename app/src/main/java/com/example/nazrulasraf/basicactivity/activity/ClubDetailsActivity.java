@@ -49,8 +49,6 @@ public class ClubDetailsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 clubJoined = dataSnapshot.child("clubJoined").getValue(String.class);
-//                Toast.makeText(ClubDetailsActivity.this, "clubJoined : " + clubJoined, Toast.LENGTH_SHORT).show();
-
                 Query query = clubRef.orderByChild("clubName").equalTo(clubJoined);
                 query.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -81,6 +79,5 @@ public class ClubDetailsActivity extends AppCompatActivity {
 
             }
         });
-//        Toast.makeText(ClubDetailsActivity.this, "clubJoined : " + clubJoined, Toast.LENGTH_SHORT).show();
     }
 }

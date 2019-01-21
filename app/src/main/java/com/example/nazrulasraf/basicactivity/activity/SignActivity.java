@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.nazrulasraf.basicactivity.R;
@@ -97,7 +95,7 @@ public class SignActivity extends AppCompatActivity {
             editTextPassword.requestFocus();
         }
 
-        if(!(password.equals(confPassword))){
+        if (!(password.equals(confPassword))) {
             editTextConfPassword.setError("Password do not match");
             editTextConfPassword.requestFocus();
         }
@@ -112,16 +110,17 @@ public class SignActivity extends AppCompatActivity {
                     current_user_db.child("fullname").setValue("User Full Name");
                     current_user_db.child("class").setValue("User Class");
                     current_user_db.child("clubJoined").setValue("User Club");
-                    Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Registration Successful",
+                            Toast.LENGTH_SHORT).show();
                     finish();
                     startActivity(new Intent(SignActivity.this, MainActivity.class));
-                }
-                else {
+                } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
-                        Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(),task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "You are already registered",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), task.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             }

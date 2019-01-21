@@ -92,7 +92,8 @@ public class EditProfileActivity extends AppCompatActivity {
         editTextClass = findViewById(R.id.editTextProfClass);
 
         //Get current user profile image
-        firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFireStore.collection("Users").document(userID)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -105,11 +106,14 @@ public class EditProfileActivity extends AppCompatActivity {
                         RequestOptions placeholderRequest = new RequestOptions();
                         placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_24);
 
-                        Glide.with(EditProfileActivity.this).setDefaultRequestOptions(placeholderRequest).load(image).into(imageProf);
+                        Glide.with(EditProfileActivity.this)
+                                .setDefaultRequestOptions(placeholderRequest)
+                                .load(image).into(imageProf);
                     }
                 } else {
                     String error = task.getException().getMessage();
-                    Toast.makeText(EditProfileActivity.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditProfileActivity.this,
+                            "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
                 }
             }
         });

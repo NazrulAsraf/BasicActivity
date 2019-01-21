@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,7 +121,8 @@ public class ClubFragment extends Fragment {
                     clubs.add(clubsName);
                 }
 
-                ArrayAdapter<String> clubAdapter = new ArrayAdapter<>(RootView.getContext(), android.R.layout.simple_spinner_item, clubs);
+                ArrayAdapter<String> clubAdapter = new ArrayAdapter<>(RootView.getContext(),
+                        android.R.layout.simple_spinner_item, clubs);
                 clubAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 clubSpinner.setAdapter(clubAdapter);
             }
@@ -165,23 +165,25 @@ public class ClubFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //Action after Yes is pressed
-//                                String userID = mAuth.getCurrentUser().getUid();
                                 final DatabaseReference current_db = dbUser.child(userID);
                                 //Query to check whether user has already joined a club or not.
-//                                Query query = dbUser.orderByChild("clubJoined").equalTo("User Club");
                                 queryCheckClub.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot.exists()) {
-                                            current_db.child("clubJoined").setValue(selectClub).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            current_db.child("clubJoined")
+                                                    .setValue(selectClub).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
-                                                    Toast.makeText(getContext(), "You have successfully joined " + selectClub + "!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(getContext(),
+                                                            "You have successfully joined " + selectClub + "!",
+                                                            Toast.LENGTH_LONG).show();
                                                 }
                                             });
 
                                         } else {
-                                            Toast.makeText(getContext(), "You are already in a club!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(),
+                                                    "You are already in a club!", Toast.LENGTH_LONG).show();
                                         }
                                     }
 
@@ -203,15 +205,17 @@ public class ClubFragment extends Fragment {
                 confAlert.show();
             }
         });
-
+        //To view the club details
         btnClubDetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final DatabaseReference curr_db = dbUser.child(userID);
-                queryCheckClub.addListenerForSingleValueEvent(new ValueEventListener() {
+                final String noClub = "User Club";
+                Query queryCheckUserClub = curr_db.child("clubJoined").equalTo("User Club");
+                queryCheckUserClub.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
+                        if (dataSnapshot.exists()) {
                             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
                             alert.setTitle("Alert");
                             alert.setMessage("You are not in a club yet. Please join a club to view its details.");

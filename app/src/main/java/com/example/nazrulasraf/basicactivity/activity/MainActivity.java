@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG_HOME = "home";
     private static final String TAG_PROFILE = "profile";
     private static final String TAG_CLUB = "club";
-    private static final String TAG_NOTIFICATIONS = "notifications";
-    private static final String TAG_SETTINGS = "settings";
+//    private static final String TAG_NOTIFICATIONS = "notifications";
+//    private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
@@ -177,7 +177,8 @@ public class MainActivity extends AppCompatActivity implements
                 .into(imgNavHeaderBg);
 
         //Load Profile Image from Firestore
-        firebaseFireStore.collection("Users").document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        firebaseFireStore.collection("Users").document(userID)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
@@ -190,13 +191,17 @@ public class MainActivity extends AppCompatActivity implements
                         }
 
                         RequestOptions placeholderRequest = new RequestOptions();
-                        placeholderRequest.placeholder(R.drawable.baseline_account_circle_black_24);
+                        placeholderRequest
+                                .placeholder(R.drawable.baseline_account_circle_black_24);
 
-                        Glide.with(MainActivity.this).setDefaultRequestOptions(placeholderRequest).load(image).apply(RequestOptions.circleCropTransform()).into(imgProfile);
+                        Glide.with(MainActivity.this).setDefaultRequestOptions(placeholderRequest)
+                                .load(image)
+                                .apply(RequestOptions.circleCropTransform()).into(imgProfile);
                     }
                 } else {
                     String error = task.getException().getMessage();
-                    Toast.makeText(MainActivity.this, "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,
+                            "(FIRESTORE Retrieve Error) : " + error, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -222,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements
             toggleFab();
             return;
         }
-
         // Sometimes, when fragment has huge data, screen seems hanging
         // when switching between navigation menus
         // So using runnable, the fragment is loaded with cross fade effect
@@ -232,7 +236,8 @@ public class MainActivity extends AppCompatActivity implements
             public void run() {
                 // update the main content by replacing fragments
                 Fragment fragment = getHomeFragment();
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager()
+                        .beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
                 fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
@@ -269,15 +274,15 @@ public class MainActivity extends AppCompatActivity implements
                 // movies fragment
                 Fragment clubFragment = new ClubFragment();
                 return clubFragment;
-            case 3:
-                // notifications fragment
-                Fragment notificationsFragment = new NotificationsFragment();
-                return notificationsFragment;
-
-            case 4:
-                // settings fragment
-                Fragment settingsFragment = new SettingsFragment();
-                return settingsFragment;
+//            case 3:
+//                // notifications fragment
+//                Fragment notificationsFragment = new NotificationsFragment();
+//                return notificationsFragment;
+//
+//            case 4:
+//                // settings fragment
+//                Fragment settingsFragment = new SettingsFragment();
+//                return settingsFragment;
             default:
                 return new HomeFragment();
         }
@@ -312,14 +317,14 @@ public class MainActivity extends AppCompatActivity implements
                         navItemIndex = 2;
                         CURRENT_TAG = TAG_CLUB;
                         break;
-                    case R.id.nav_notifications:
-                        navItemIndex = 3;
-                        CURRENT_TAG = TAG_NOTIFICATIONS;
-                        break;
-                    case R.id.nav_settings:
-                        navItemIndex = 4;
-                        CURRENT_TAG = TAG_SETTINGS;
-                        break;
+//                    case R.id.nav_notifications:
+//                        navItemIndex = 3;
+//                        CURRENT_TAG = TAG_NOTIFICATIONS;
+//                        break;
+//                    case R.id.nav_settings:
+//                        navItemIndex = 4;
+//                        CURRENT_TAG = TAG_SETTINGS;
+//                        break;
                     case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));

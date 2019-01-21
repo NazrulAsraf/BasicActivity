@@ -79,19 +79,17 @@ public class PostActivity extends AppCompatActivity {
                                     newPost.child("timestamp").setValue(System.currentTimeMillis());
                                     newPost.child("title").setValue(postTitle);
                                     newPost.child("content").setValue(postContent);
-                                    newPost.child("uid").setValue(mCurrentUser.getUid());
-                                    newPost.child("username").setValue(dataSnapshot.child("username").getValue()).
-                                            addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        newPostProgress.setVisibility(View.INVISIBLE);
-                                                        Intent intent = new Intent(PostActivity.this, MainActivity.class);
-                                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                        startActivity(intent);
-                                                    }
-                                                }
-                                            });
+                                    newPost.child("uid").setValue(mCurrentUser.getUid()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                newPostProgress.setVisibility(View.INVISIBLE);
+                                                Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                startActivity(intent);
+                                            }
+                                        }
+                                    });
                                 }
 
                                 @Override

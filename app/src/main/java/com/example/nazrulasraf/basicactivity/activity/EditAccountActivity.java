@@ -125,7 +125,8 @@ public class EditAccountActivity extends AppCompatActivity implements DialogConf
 
                                 FirebaseAuth.getInstance().signOut();
 
-                                Toast.makeText(EditAccountActivity.this, "User Details Updated! Please Login Again.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditAccountActivity.this,
+                                        "User Details Updated! Please Login Again.", Toast.LENGTH_SHORT).show();
 
                                 Intent intent = new Intent(EditAccountActivity.this, LoginActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -134,12 +135,14 @@ public class EditAccountActivity extends AppCompatActivity implements DialogConf
                                 finish();
                             } else {
                                 String error = task.getException().toString();
-                                Toast.makeText(EditAccountActivity.this, "Error " + error, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditAccountActivity.this,
+                                        "Error " + error, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 } else {
-                    Toast.makeText(EditAccountActivity.this, "Password is Wrong! Please Re-enter your password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditAccountActivity.this,
+                            "Password is Wrong! Please Re-enter your password", Toast.LENGTH_SHORT).show();
                 }
             }
         });

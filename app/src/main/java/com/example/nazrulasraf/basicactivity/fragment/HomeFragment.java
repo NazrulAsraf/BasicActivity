@@ -3,6 +3,7 @@ package com.example.nazrulasraf.basicactivity.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,9 @@ import com.example.nazrulasraf.basicactivity.R;
 import com.example.nazrulasraf.basicactivity.other.PostsData;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +32,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -148,16 +152,30 @@ public class HomeFragment extends Fragment {
                         query.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                String profileName = dataSnapshot.child("username").getValue().toString();
-                                String homePostTitle = dataSnapshot.child("title").getValue().toString();
-                                String homePostContent = dataSnapshot.child("content").getValue().toString();
+//                                String profileName = dataSnapshot.child("username").getValue().toString();
+                                String homePostTitle = dataSnapshot.child("title").getValue(String.class);
+                                String homePostContent = dataSnapshot.child("content").getValue(String.class);
                                 Long homePostTimestamp = dataSnapshot.child("timestamp").getValue(Long.class);
+                                String postUserID = dataSnapshot.child("uid").getValue(String.class);
 
                                 Date longDate = new Date(homePostTimestamp);
                                 SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a EEE, dd MMM yyyy");
                                 sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 
-                                holder.userName.setText(profileName);
+                                userRef.child(postUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        String profileName = dataSnapshot.child("username").getValue(String.class);
+                                        holder.userName.setText(profileName);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+
+
                                 holder.postTimestamp.setText(sdf.format(longDate));
                                 holder.postTitle.setText(homePostTitle);
                                 holder.postContent.setText(homePostContent);

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -68,6 +69,7 @@ public class AddClubActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Toast.makeText(AddClubActivity.this, "Saving...", Toast.LENGTH_LONG).show();
+                        mDatabaseUser.child("clubJoined").setValue(clubName);
                         newClub.child("clubName").setValue(clubName);
                         newClub.child("clubDetails").setValue(clubDetails);
                         newClub.child("clubFaculty").setValue(clubFaculty);
@@ -77,7 +79,10 @@ public class AddClubActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()){
-                                            startActivity(new Intent(AddClubActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                                            Toast.makeText(AddClubActivity.this,
+                                                    "Club is successfully created!", Toast.LENGTH_LONG).show();
+                                            startActivity(new Intent(AddClubActivity.this, MainActivity.class)
+                                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                                         }
                                     }
                                 });
@@ -85,7 +90,7 @@ public class AddClubActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        Log.d("AddClub", "Error " + databaseError);
                     }
                 });
             }
